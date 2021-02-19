@@ -1,0 +1,31 @@
+{
+  "name": "binance-futures-monitor",
+  "version": "1.0.0",
+  "description": "binance futures montioring",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chopbk/binance-futures-monitor.git"
+  },
+  "keywords": [
+    "binance",
+    "futures",
+    "bot",
+    "monitor"
+  ],
+  "author": "chopbk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chopbk/binance-futures-monitor/issues"
+  },
+  "homepage": "https://github.com/chopbk/binance-futures-monitor#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "node-binance-api": "^0.12.4",
+    "node-telegram-bot-api": "^0.51.0",
+    "winston": "^3.3.3"
+  }
+}
