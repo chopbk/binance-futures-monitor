@@ -36,7 +36,10 @@ module.exports = async function () {
     // auto save price
     await FuturesPrice.init();
     monitorClient.setEvenEmitter(eventEmitter);
-    monitorClient.startFuturesMonitorCLient("local");
+    runs.map(async (env) => {
+      monitorClient.startFuturesMonitorCLient(env);
+    }
+    
   } catch (error) {
     logger.error(`[Loader] ` + error.message);
   }

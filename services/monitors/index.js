@@ -57,6 +57,7 @@ class FuturesMonitorCLient {
         }
         switch (order.orderStatus) {
           case "NEW":
+            return;
             break;
           case "PARTIALLY_FILLED":
             status += `đã khớp một phần.`;
