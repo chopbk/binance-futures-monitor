@@ -4,7 +4,9 @@
   "description": "binance futures montioring",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-test": "set NODE_ENV=test&&set TELE=test&&set RUN=test&&set DEBUG=true&&nodemon index.js --ignore *test/  --ignore *config/",
+    "start-monitor1": "set NODE_ENV=monitor1&&set TELE=monitor1&&set RUN=local&&set DEBUG=true&&nodemon index.js --ignore *test/  --ignore *config/"
   },
   "repository": {
     "type": "git",
@@ -23,9 +25,12 @@
   },
   "homepage": "https://github.com/chopbk/binance-futures-monitor#readme",
   "dependencies": {
+    "circular-json": "^0.5.9",
     "dotenv": "^8.2.0",
+    "mongoose": "^5.12.14",
     "node-binance-api": "^0.12.4",
     "node-telegram-bot-api": "^0.51.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
   }
 }
