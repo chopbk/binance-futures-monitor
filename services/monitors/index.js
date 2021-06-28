@@ -1,4 +1,5 @@
 const { getFuturesClient } = require("../futures/futures-client");
+const logger = require("../utils/logger");
 class FuturesMonitorCLient {
   constructor() {
     this.client = {};
@@ -16,15 +17,15 @@ class FuturesMonitorCLient {
     let futuresClient = getFuturesClient(env);
     futuresClient.websockets.userFutureData(
       (data) => {
-        console.log(data);
+        logger.debug(data);
       },
       (data) => {
-        console.log(data.updateData.eventReasonType);
-        console.log(data.updateData.balances);
-        console.log(data.updateData.positions);
+        logger.debug(data.updateData.eventReasonType);
+        logger.debug(data.updateData.balances);
+        logger.debug(data.updateData.positions);
       },
       (data) => {
-        console.log(data);
+        logger.debug(data);
         let order = data.order;
         let status = "";
         let message,
@@ -57,7 +58,7 @@ class FuturesMonitorCLient {
         }
         switch (order.orderStatus) {
           case "NEW":
-            return;
+            //return;
             break;
           case "PARTIALLY_FILLED":
             status += `đã khớp một phần.`;
@@ -83,7 +84,7 @@ class FuturesMonitorCLient {
         switch (order.orderType) {
           case "MARKET":
             price = order.averagePrice;
-            if (order.orderStatus == "NEW") return;
+            //if (order.orderStatus == "NEW") return;
             //if (order.orderStatus == "PARTIALLY_FILLED") return;
             break;
           case "STOP_MARKET":
@@ -108,12 +109,16 @@ class FuturesMonitorCLient {
           default:
             break;
         }
-        message = ` [#${order.positionSide}]  Lệnh ${order.side} ${orderType} ${quantity} #${order.symbol} Price=${price}$ ${status} `;
+        message = `[${new Date(order.orderTradeTime).toISOString()}] [#${
+          order.positionSide
+        }]  Lệnh ${order.side} ${orderType} ${quantity} #${
+          order.symbol
+        } Price=${price}$ ${status} `;
         this.sendReport(message, env);
-        console.log(message);
+        logger.debug(message);
       },
-      console.log,
-      console.log
+      logger.debug,
+      logger.debug
     );
   };
 }

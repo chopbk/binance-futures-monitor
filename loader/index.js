@@ -34,12 +34,11 @@ module.exports = async function () {
     // create symbol info storage
     await SymbolInfos.init();
     // auto save price
-    await FuturesPrice.init();
+    //await FuturesPrice.init();
     monitorClient.setEvenEmitter(eventEmitter);
     runs.map(async (env) => {
       monitorClient.startFuturesMonitorCLient(env);
-    }
-    
+    });
   } catch (error) {
     logger.error(`[Loader] ` + error.message);
   }
