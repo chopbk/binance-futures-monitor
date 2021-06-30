@@ -47,18 +47,20 @@ class FuturesMonitorCLient {
             status += `đã ${open ? "mở" : "đặt"} thành công`;
             break;
           case "CANCELED":
+            return;
             status += "đã hủy ";
             break;
           case "CALCULATED":
             break;
           case "EXPIRED":
+            return;
             status += "đã hết hạn ";
           case "TRADE":
             break;
         }
         switch (order.orderStatus) {
           case "NEW":
-            //return;
+            if (order.orderType !== "STOP_MARKET") return;
             break;
           case "PARTIALLY_FILLED":
             status += `đã khớp một phần.`;
@@ -99,7 +101,7 @@ class FuturesMonitorCLient {
             break;
           case "LIMIT":
             price = order.originalPrice;
-            if (open) orderType += `#LIMIT (Mở vị thế)`;
+            if (open) orderType = `#LIMIT (Mở vị thế)`;
             else orderType = `#Chốt_lãi_LIMIT`;
             break;
           case "CANCELED":

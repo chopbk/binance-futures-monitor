@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-test": "set NODE_ENV=test&&set TELE=test&&set RUN=test&&set DEBUG=true&&nodemon index.js --ignore *test/  --ignore *config/",
-    "start-monitor1": "set NODE_ENV=monitor1&&set TELE=monitor1&&set RUN=local&&set DEBUG=true&&nodemon index.js --ignore *test/  --ignore *config/"
+    "start-monitor1": "export NODE_ENV=monitor&&export TELE=monitor1&&export RUN=b1,b2,b3,b4,b5,b6,r1,r2&&pm2 index.js --name=monitor1",
+    "start-monitor2": "export NODE_ENV=monitor2&&export TELE=monitor2&&export RUN=local,binh,na,thuyen,dan,thao,hai,my,tan,h1,chien,an&&pm2 index.js --name=monitor2",
+    "start-monitor3": "export NODE_ENV=monitor3&&export TELE=monitor3&&export RUN=binh2,dan2,thao2,na2,thuyen2,an2,h2,hai2,my2,tan2,chien2&&pm2 index.js --name=monitor3",
+    "start-monitor4": "export NODE_ENV=monitor4&&export TELE=monitor4&&export RUN=zen,tien,linh,qa,bean,trung,manh,can,hien&&pm2 index.js --name=monitor4"
   },
   "repository": {
     "type": "git",
