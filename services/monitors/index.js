@@ -17,12 +17,33 @@ class FuturesMonitorCLient {
     let futuresClient = getFuturesClient(env);
     futuresClient.websockets.userFutureData(
       (data) => {
-        logger.debug(data);
+        console.log(data);
       },
       (data) => {
-        logger.debug(data.updateData.eventReasonType);
-        logger.debug(data.updateData.balances);
-        logger.debug(data.updateData.positions);
+        let message, flow, action;
+        console.log(data.updateData);
+        let updateData = data.updateData;
+        if (
+          updateData.eventReasonType == "DEPOSIT" ||
+          updateData.eventReasonType == "WITHDRAW"
+        ) {
+          if (updateData.eventReasonType === "DEPOSIT") {
+            action = "bơm thêm";
+            flow = "vào";
+          } else {
+            action = "rút";
+            flow = "ra khỏi";
+          }
+          message = `Phát hiện ${env} ${action} ${
+            updateData.balances[0].pnl
+          }USDT ${flow} tài khoản futures vào lúc ${new Date(
+            data.eventTime
+          ).toISOString()}. Số dư hiện tại ${
+            updateData.balances[0].crossWalletBalance
+          } USDT`;
+          this.sendReport(message, env);
+          logger.debug(message);
+        }
       },
       (data) => {
         logger.debug(data);
@@ -119,8 +140,8 @@ class FuturesMonitorCLient {
         this.sendReport(message, env);
         logger.debug(message);
       },
-      logger.debug,
-      logger.debug
+      console.log,
+      console.log
     );
   };
 }
