@@ -31,6 +31,7 @@ module.exports = async function () {
     logger.warn(`[${env}] TELE: ${envTele} MQTT: ${envMqtt} `);
     // init telegram for report
     await require("./telegram.loader")(eventEmitter, envTele);
+    await require("./mqtt.loader")(eventEmitter, envMqtt);
     // create symbol info storage
     await SymbolInfos.init();
     // auto save price

@@ -31,6 +31,7 @@
     "circular-json": "^0.5.9",
     "dotenv": "^8.2.0",
     "mongoose": "^5.12.14",
+    "mqtt": "^4.2.8",
     "node-binance-api": "^0.12.4",
     "node-telegram-bot-api": "^0.51.0",
     "winston": "^3.3.3",

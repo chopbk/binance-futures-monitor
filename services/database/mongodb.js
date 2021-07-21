@@ -9,7 +9,7 @@ const logger = require("../utils/logger");
 const AccountConfigSchema = require("./schemas/account-config");
 const FuturesSymbolSchema = require("./schemas/futures-symbol");
 const TelegramConfigSchema = require("./schemas/telegram-config");
-
+const MqttConfigSchema = require("./schemas/mqtt-config");
 class MongoDb {
   constructor(config = CFG) {
     this.config = config;
@@ -31,6 +31,7 @@ class MongoDb {
         "Futures_Symbol",
         FuturesSymbolSchema
       );
+      this.MqttConfigModel = mongoose.model("Mqtt_Config", MqttConfigSchema);
     } catch (error) {
       throw error;
     }
@@ -44,6 +45,9 @@ class MongoDb {
   }
   getFuturesSymbolModel() {
     return this.FuturesSymbolModel;
+  }
+  getMqttConfigModel() {
+    return this.MqttConfigModel;
   }
 }
 module.exports = new MongoDb();
