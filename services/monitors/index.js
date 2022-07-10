@@ -63,7 +63,7 @@ class FuturesMonitorCLient {
           : order.side == "SELL"
           ? (open = true)
           : (open = false);
-
+      if(open === true) return;
         switch (order.executionType) {
           case "NEW":
             status += `đã ${open ? "mở" : "đặt"} thành công`;
@@ -87,6 +87,7 @@ class FuturesMonitorCLient {
           case "PARTIALLY_FILLED":
             status += `đã khớp một phần.`;
             quantity = order.orderLastFilledQuantity;
+            return;
             if (open !== true) status += ` Lãi/Lỗ ${order.realizedProfit}$.`;
             else return;
             break;
@@ -130,6 +131,7 @@ class FuturesMonitorCLient {
             price = order.stopPrice;
             quantity = "";
             orderType = `#STOPLOSS`;
+            return;
             break;
           case "TAKE_PROFIT_MARKET":
             price = order.stopPrice;
@@ -153,10 +155,11 @@ class FuturesMonitorCLient {
         }]  Lệnh ${order.side} ${orderType} ${quantity} #${
           order.symbol
         } Price=${price}$ ${status} `;
-        if (process.env.ORDER == true) {
+        
+        console.log(process.env.ORDER);
+        if(process.env.ORDER) 
           this.sendReport(message, env);
           logger.debug(message);
-        }
       },
       console.log,
       console.log
