@@ -5,6 +5,8 @@ class FuturesMonitorCLient {
   constructor() {
     this.client = {};
     this.configApi = {};
+    this.profit = {};
+    this.fee = {};
   }
   setEvenEmitter(eventEmitter) {
     this.eventEmitter = eventEmitter;
@@ -22,24 +24,21 @@ class FuturesMonitorCLient {
       },
       (data) => {
         let message, flow, action;
-        console.log(data.updateData);
         let updateData = data.updateData;
         if (
           updateData.eventReasonType == "DEPOSIT" ||
           updateData.eventReasonType == "WITHDRAW"
         ) {
           if (updateData.eventReasonType === "DEPOSIT") {
-            action = "bơm thêm";
-            flow = "vào";
+            action = "BƠM";
+            flow = "VÀO";
           } else {
-            action = "rút";
-            flow = "ra khỏi";
+            action = "RÚT";
+            flow = "RA";
           }
-          message = `Phát hiện ${env} ${action} ${
+          message = `#${env} ${action} ${
             updateData.balances[0].pnl
-          }USDT ${flow} tài khoản futures vào lúc ${new Date(
-            data.eventTime
-          ).toISOString()}. Số dư hiện tại ${
+          }USDT ${flow} ${new Date(data.eventTime).toISOString()}. Số dư ${
             updateData.balances[0].crossWalletBalance
           } USDT`;
           this.sendReport(message, env);
@@ -47,11 +46,12 @@ class FuturesMonitorCLient {
         }
       },
       (data) => {
-        console.log(data);
+        if (!!proces.env.DEBUG) console.log(data);
         let order = data.order;
         let status = "";
         let message,
           price,
+          lastFilledPrice,
           quantity = order.originalQuantity,
           open = false,
           orderType = order.orderType;
@@ -63,38 +63,32 @@ class FuturesMonitorCLient {
           : order.side == "SELL"
           ? (open = true)
           : (open = false);
-      if(open === true) return;
+        // only process the order if order has bean excuted
         switch (order.executionType) {
           case "NEW":
-            status += `đã ${open ? "mở" : "đặt"} thành công`;
-            break;
           case "CANCELED":
-            return;
-            status += "đã hủy ";
-            break;
           case "CALCULATED":
-            break;
           case "EXPIRED":
             return;
-            status += "đã hết hạn ";
           case "TRADE":
             break;
         }
+        if (!this.profit[order.symbol]) this.profit[order.symbol] = 0;
+        if (!this.fee[order.symbol]) this.fee[order.symbol] = 0;
+        // only process the order if order has bean filled or partially filled
         switch (order.orderStatus) {
           case "NEW":
-            if (order.orderType !== "STOP_MARKET") return;
-            break;
-          case "PARTIALLY_FILLED":
-            status += `đã khớp một phần.`;
-            quantity = order.orderLastFilledQuantity;
+          case "CANCELED":
+          case "EXPIRED":
             return;
-            if (open !== true) status += ` Lãi/Lỗ ${order.realizedProfit}$.`;
-            else return;
-            break;
+          case "PARTIALLY_FILLED":
+            quantity = order.orderLastFilledQuantity;
+            this.profit[order.symbol] += parseFloat(order.realizedProfit);
+            this.fee[order.symbol] += parseFloat(order.commission);
+
+            return;
           case "FILLED":
-            status += `đã khớp toàn bộ.`;
             if (order.orderType === "MARKET") {
-              status += ` Giá khớp gần nhất: ${order.lastFilledPrice}$.`;
               if (
                 open === false &&
                 (order.originalOrderType === "TAKE_PROFIT_MARKET" ||
@@ -109,57 +103,48 @@ class FuturesMonitorCLient {
                 });
               }
             }
-
-            if (open !== true) status += ` Lãi/Lỗ ${order.realizedProfit}$.`;
-
+            this.profit[order.symbol] += parseFloat(order.realizedProfit);
+            this.fee[order.symbol] += parseFloat(order.commission);
             break;
-          case "CANCELED":
-            break;
-          case "EXPIRED":
-            return;
           default:
             break;
         }
-
-        switch (order.orderType) {
+        price = parseFloat(order.averagePrice);
+        lastFilledPrice = order.lastFilledPrice;
+        quantity = parseFloat(order.orderFilledAccumulatedQuantity);
+        switch (order.originalOrderType) {
           case "MARKET":
-            price = order.averagePrice;
-            //if (order.orderStatus == "NEW") return;
-            //if (order.orderStatus == "PARTIALLY_FILLED") return;
-            break;
-          case "STOP_MARKET":
-            price = order.stopPrice;
-            quantity = "";
-            orderType = `#STOPLOSS`;
-            return;
+            orderType = `MARKET`;
             break;
           case "TAKE_PROFIT_MARKET":
-            price = order.stopPrice;
-            quantity = "";
-            orderType = `#Chốt_lãi_MARKET)`;
+            //market buy
+            orderType = `PROFIT`;
+            break;
+          case "STOP_MARKET":
+            orderType = `STOPLOSS`;
             break;
           case "LIMIT":
-            price = order.originalPrice;
-            if (open) orderType = `#LIMIT (Mở vị thế)`;
-            else orderType = `#Chốt_lãi_LIMIT`;
-            break;
-          case "CANCELED":
-            break;
-          case "EXPIRED":
+            price = parseFloat(order.originalPrice);
+            orderType = `#LIMIT`;
             break;
           default:
             break;
         }
-        message = `[${new Date(order.orderTradeTime).toISOString()}] [#${
-          order.positionSide
-        }]  Lệnh ${order.side} ${orderType} ${quantity} #${
+        message = `#${open ? "MỞ" : "ĐÓNG"}${
+          order.closeAll ? "_VỊ_THẾ" : ""
+        } #${orderType} #${order.positionSide} ${quantity} #${
           order.symbol
-        } Price=${price}$ ${status} `;
-        
-        console.log(process.env.ORDER);
-        if(process.env.ORDER) 
-          this.sendReport(message, env);
-          logger.debug(message);
+        } PRICE ${price}$ VOLUME ${(quantity * price).toFixed(
+          2
+        )}$ FEE ${this.fee[order.symbol].toFixed(3)}$ `;
+        if (!open)
+          message += `${
+            this.profit[order.symbol] > 0 ? "PROFIT" : "LOSS"
+          } ${this.profit[order.symbol].toFixed(3)}USDT`;
+        this.profit[order.symbol] = 0;
+        this.fee[order.symbol] = 0;
+        this.sendReport(message, env);
+        console.log(message);
       },
       console.log,
       console.log

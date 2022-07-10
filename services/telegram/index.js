@@ -115,7 +115,7 @@ class TeleBot {
             } else {
               let item = bot.queue.receive();
               bot.sendReport(
-                `[${item.env || process.env.NODE_ENV}]: ${item.message}`
+                `#${item.env || process.env.NODE_ENV}: ${item.message}`
               );
             }
           }, 2003);
