@@ -46,7 +46,7 @@ class FuturesMonitorCLient {
         }
       },
       (data) => {
-        if (!!proces.env.DEBUG) console.log(data);
+        if (!!process.env.DEBUG) console.log(data);
         let order = data.order;
         let status = "";
         let message,
