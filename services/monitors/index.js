@@ -122,6 +122,7 @@ class FuturesMonitorCLient {
             break;
           case "STOP_MARKET":
             orderType = `STOPLOSS`;
+            if (this.profit[order.symbol] > 0) orderType += "_DƯƠNG";
             break;
           case "LIMIT":
             price = parseFloat(order.originalPrice);
