@@ -23,6 +23,7 @@ class FuturesMonitorCLient {
         console.log(data);
       },
       (data) => {
+        console.log(data.updateData.balances);
         let message, flow, action;
         let updateData = data.updateData;
         if (
@@ -37,7 +38,7 @@ class FuturesMonitorCLient {
             flow = "RA";
           }
           message = `#${env} ${action} ${
-            updateData.balances[0].pnl
+            updateData.balances[0].balanceChange
           }USDT ${flow} ${new Date(data.eventTime).toISOString()}. Số dư ${
             updateData.balances[0].crossWalletBalance
           } USDT`;
